@@ -102,6 +102,28 @@
     .config-banner { background: #fffde7; border: 1px solid #f0e040; border-radius: var(--radius); padding: 1rem 1.25rem; margin-bottom: 2rem; font-size: 13px; color: #666; line-height: 1.7; }
     .config-banner code { background: rgba(0,0,0,0.06); padding: 2px 6px; border-radius: 4px; font-size: 12px; color: #333; font-family: monospace; }
 
+    /* CTA */
+    .cta-block { text-align: center; margin: 2.5rem 0 0; padding: 2rem 1rem; }
+    .cta-text { font-size: 14px; color: var(--text-muted); line-height: 1.7; margin-bottom: 1.25rem; max-width: 380px; margin-left: auto; margin-right: auto; }
+    .cta-btn {
+      display: inline-block;
+      background: var(--surface); color: #111;
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 14px; font-weight: 700;
+      padding: 12px 28px; border-radius: 99px;
+      text-decoration: none; letter-spacing: -0.2px;
+      border: 1px solid var(--border);
+      transition: border-color 0.15s, box-shadow 0.15s, transform 0.1s;
+    }
+    .cta-btn:hover { border-color: var(--border-hover); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+    .cta-btn:active { transform: translateY(0); }
+
+    /* FOOTER */
+    .site-footer { background: #e8ff47; padding: 2.5rem 1.5rem; margin-top: 3rem; text-align: center; }
+    .footer-logo { font-family: 'Bricolage Grotesque', sans-serif; font-size: 22px; font-weight: 800; color: #111; letter-spacing: -0.5px; }
+    .footer-logo span { color: #b8cc00; }
+    .footer-sub { font-size: 12px; color: rgba(0,0,0,0.45); margin-top: 6px; letter-spacing: 0.03em; }
+
     @media (max-width: 480px) {
       .site-header { padding: 1.5rem 1.25rem 1.25rem; }
       .header-tag { display: none; }
@@ -144,6 +166,10 @@
     <div class="platform-grid" id="platform-grid">
       <div class="loading-state">Cargando datos&hellip;</div>
     </div>
+    <div class="cta-block">
+      <p class="cta-text">Si quieres recibir todas las novedades de Social Media directamente en tu bandeja de entrada, &uacute;nete a la newsletter.</p>
+      <a class="cta-btn" href="https://socialgeekpro.beehiiv.com/" target="_blank">&#128232; Suscr&iacute;bete</a>
+    </div>
   </div>
 
   <div class="screen" id="screen-2">
@@ -162,6 +188,11 @@
     <div class="news-list" id="news-list"></div>
   </div>
 </div>
+
+<footer class="site-footer">
+  <div class="footer-logo">Socialgeek<span>.</span>News</div>
+  <div class="footer-sub">by Iago Parga &middot; Monitor de redes sociales</div>
+</footer>
 
 <script>
   let allNews = [], selectedPlatform = null, currentDays = 7;
@@ -312,7 +343,5 @@
 
   loadData();
 </script>
-</body>
-</html>
 </body>
 </html>
