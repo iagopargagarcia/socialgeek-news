@@ -4,233 +4,168 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Socialgeek News</title>
-  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg: #0d0d0d;
-      --surface: #161616;
-      --surface2: #1e1e1e;
-      --border: rgba(255,255,255,0.08);
-      --border-hover: rgba(255,255,255,0.18);
-      --text: #f0f0f0;
-      --text-muted: #888;
-      --text-dim: #555;
+      --bg: #f7f7f5;
+      --surface: #ffffff;
+      --surface2: #efefed;
+      --border: rgba(0,0,0,0.08);
+      --border-hover: rgba(0,0,0,0.2);
+      --text: #111111;
+      --text-muted: #666;
+      --text-dim: #aaa;
       --accent: #e8ff47;
-      --accent-dim: rgba(232,255,71,0.12);
       --radius: 12px;
-      --radius-sm: 8px;
     }
 
     html { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 16px; }
     body { min-height: 100vh; }
 
-    .app { max-width: 720px; margin: 0 auto; padding: 2.5rem 1.25rem 4rem; }
-
-    /* HEADER */
-    .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 3rem; }
-    .logo-wrap { display: flex; flex-direction: column; gap: 3px; }
-    .logo { font-family: 'Bricolage Grotesque', sans-serif; font-size: 24px; font-weight: 700; letter-spacing: -0.5px; color: var(--text); }
+    /* HEADER NEGRO */
+    .site-header { background: #111; padding: 2rem 1.5rem 1.75rem; }
+    .site-header-inner {
+      max-width: 720px; margin: 0 auto;
+      display: flex; align-items: flex-end; justify-content: space-between;
+      gap: 1rem; flex-wrap: wrap;
+    }
+    .logo-wrap { display: flex; flex-direction: column; gap: 4px; }
+    .logo {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: clamp(32px, 6vw, 56px);
+      font-weight: 800; letter-spacing: -1px; color: #fff; line-height: 1;
+    }
     .logo span { color: var(--accent); }
-    .logo-by { font-size: 11px; font-weight: 400; color: #e8ff47; letter-spacing: 0.02em; font-family: 'DM Sans', sans-serif; }
-    .header-tag { font-size: 12px; color: var(--text-dim); letter-spacing: 0.06em; text-transform: uppercase; }
+    .logo-by { font-size: 12px; color: var(--accent); letter-spacing: 0.03em; font-family: 'DM Sans', sans-serif; }
+    .header-tag { font-size: 11px; color: rgba(255,255,255,0.3); letter-spacing: 0.1em; text-transform: uppercase; font-weight: 500; padding-bottom: 4px; white-space: nowrap; }
 
-    /* SCREEN TRANSITIONS */
+    /* BODY */
+    .app { max-width: 720px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+
     .screen { display: none; animation: fadeIn 0.2s ease; }
     .screen.active { display: block; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* SECTION LABEL */
-    .section-label {
-      font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
-      color: var(--text-dim); margin-bottom: 1.25rem;
-    }
+    .section-label { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 1.25rem; font-weight: 500; }
 
     /* PLATFORM GRID */
     .platform-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; margin-bottom: 2.5rem; }
 
     .platform-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 1.25rem 1rem 1rem;
-      cursor: pointer;
-      transition: border-color 0.15s, background 0.15s, transform 0.1s;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1.25rem 1rem 1rem;
+      cursor: pointer; transition: border-color 0.15s, box-shadow 0.15s, transform 0.1s;
       display: flex; flex-direction: column; gap: 10px;
-      position: relative; overflow: hidden;
     }
-    .platform-card::before {
-      content: ''; position: absolute; inset: 0;
-      background: var(--accent-dim); opacity: 0;
-      transition: opacity 0.15s;
-    }
-    .platform-card:hover { border-color: var(--border-hover); transform: translateY(-2px); }
-    .platform-card:hover::before { opacity: 1; }
-    .platform-card.selected { border-color: var(--accent); }
-    .platform-card.selected::before { opacity: 1; }
+    .platform-card:hover { border-color: var(--border-hover); transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.07); }
+    .platform-card.selected { border: 2px solid #111; }
 
-    .platform-icon {
-      width: 38px; height: 38px; border-radius: 8px;
-      display: flex; align-items: center; justify-content: center;
-      background: var(--surface2);
-    }
+    .platform-icon { width: 38px; height: 38px; border-radius: 8px; display: flex; align-items: center; justify-content: center; background: var(--surface2); }
+    .platform-icon img { width: 20px; height: 20px; }
     .platform-icon svg { width: 20px; height: 20px; }
-    .platform-name { font-family: 'Bricolage Grotesque', sans-serif; font-size: 13px; font-weight: 600; color: var(--text); }
+    .platform-name { font-family: 'Bricolage Grotesque', sans-serif; font-size: 13px; font-weight: 700; color: var(--text); }
     .platform-count { font-size: 11px; color: var(--text-muted); }
 
-    /* BACK + BREADCRUMB */
+    /* NAV */
     .nav-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; }
-    .back-btn {
-      background: none; border: none; color: var(--text-muted); font-size: 13px;
-      cursor: pointer; font-family: 'DM Sans', sans-serif;
-      display: flex; align-items: center; gap: 6px; padding: 0;
-      transition: color 0.15s;
-    }
-    .back-btn:hover { color: var(--text); }
+    .back-btn { background: none; border: 1px solid var(--border); color: var(--text-muted); font-size: 13px; cursor: pointer; font-family: 'DM Sans', sans-serif; border-radius: 99px; display: flex; align-items: center; gap: 6px; padding: 6px 14px; transition: all 0.15s; }
+    .back-btn:hover { border-color: var(--border-hover); color: var(--text); }
     .breadcrumb { font-size: 13px; color: var(--text-dim); }
-    .breadcrumb strong { color: var(--accent); font-weight: 500; }
+    .breadcrumb strong { color: var(--text); font-weight: 700; font-family: 'Bricolage Grotesque', sans-serif; }
 
     /* FILTERS */
     .filter-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 2rem; }
-    .filter-btn {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 99px;
-      padding: 7px 16px;
-      font-size: 13px; color: var(--text-muted);
-      cursor: pointer; font-family: 'DM Sans', sans-serif;
-      transition: all 0.15s;
-    }
+    .filter-btn { background: var(--surface); border: 1px solid var(--border); border-radius: 99px; padding: 7px 16px; font-size: 13px; color: var(--text-muted); cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.15s; }
     .filter-btn:hover { border-color: var(--border-hover); color: var(--text); }
-    .filter-btn.active { background: var(--accent); border-color: var(--accent); color: #0d0d0d; font-weight: 500; }
+    .filter-btn.active { background: #111; border-color: #111; color: #fff; font-weight: 500; }
 
     /* RESULTS */
-    .results-meta { font-size: 12px; color: var(--text-dim); margin-bottom: 1.25rem; letter-spacing: 0.04em; }
+    .results-meta { font-size: 12px; color: var(--text-dim); margin-bottom: 1.25rem; }
+    .news-list { display: flex; flex-direction: column; gap: 8px; }
 
-    .news-list { display: flex; flex-direction: column; gap: 1px; }
-
-    .news-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 1.25rem;
-      transition: border-color 0.15s;
-      margin-bottom: 8px;
-    }
-    .news-card:hover { border-color: var(--border-hover); }
+    .news-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem 1.5rem; transition: border-color 0.15s, box-shadow 0.15s; }
+    .news-card:hover { border-color: var(--border-hover); box-shadow: 0 2px 12px rgba(0,0,0,0.05); }
 
     .news-top { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
-    .news-date { font-size: 11px; color: var(--text-dim); letter-spacing: 0.04em; }
-    .news-badge {
-      font-size: 10px; padding: 3px 8px; border-radius: 99px;
-      font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase;
-    }
-    .news-title {
-      font-family: 'Bricolage Grotesque', sans-serif; font-size: 15px; font-weight: 600;
-      color: var(--text); line-height: 1.4; margin-bottom: 6px;
-    }
-    .news-nota { font-size: 13px; color: var(--text-muted); line-height: 1.65; margin-bottom: 12px; }
-    .news-link {
-      font-size: 12px; color: var(--accent); text-decoration: none;
-      letter-spacing: 0.03em; transition: opacity 0.15s;
-    }
-    .news-link:hover { opacity: 0.7; }
+    .news-date { font-size: 11px; color: var(--text-dim); letter-spacing: 0.03em; }
+    .news-badge { font-size: 10px; padding: 3px 9px; border-radius: 99px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; }
+    .news-title { font-family: 'Bricolage Grotesque', sans-serif; font-size: 16px; font-weight: 700; color: var(--text); line-height: 1.35; margin-bottom: 6px; }
+    .news-nota { font-size: 13px; color: var(--text-muted); line-height: 1.7; margin-bottom: 12px; }
+    .news-link { font-size: 12px; color: #111; text-decoration: none; font-weight: 600; border-bottom: 1.5px solid #111; padding-bottom: 1px; transition: opacity 0.15s; }
+    .news-link:hover { opacity: 0.5; }
 
-    /* STATES */
-    .empty-state, .loading-state, .error-state {
-      text-align: center; padding: 4rem 1rem;
-      color: var(--text-dim); font-size: 14px; line-height: 1.7;
-    }
-    .error-state { color: #e05555; }
+    .empty-state, .loading-state, .error-state { text-align: center; padding: 4rem 1rem; color: var(--text-dim); font-size: 14px; line-height: 1.7; }
+    .error-state { color: #cc3333; }
 
-    /* CONFIG BANNER */
-    .config-banner {
-      background: var(--surface);
-      border: 1px dashed var(--border-hover);
-      border-radius: var(--radius);
-      padding: 1rem 1.25rem;
-      margin-bottom: 2rem;
-      font-size: 13px; color: var(--text-muted); line-height: 1.7;
-    }
-    .config-banner code {
-      background: var(--surface2); padding: 2px 6px; border-radius: 4px;
-      font-size: 12px; color: var(--accent); font-family: monospace;
+    .config-banner { background: #fffde7; border: 1px solid #f0e040; border-radius: var(--radius); padding: 1rem 1.25rem; margin-bottom: 2rem; font-size: 13px; color: #666; line-height: 1.7; }
+    .config-banner code { background: rgba(0,0,0,0.06); padding: 2px 6px; border-radius: 4px; font-size: 12px; color: #333; font-family: monospace; }
+
+    @media (max-width: 480px) {
+      .site-header { padding: 1.5rem 1.25rem 1.25rem; }
+      .header-tag { display: none; }
+      .platform-grid { grid-template-columns: repeat(2, 1fr); }
     }
   </style>
 </head>
 <body>
-<div class="app">
 
-  <header class="header">
+<div class="site-header">
+  <div class="site-header-inner">
     <div class="logo-wrap">
       <div class="logo">Socialgeek<span>.</span>News</div>
       <div class="logo-by">by Iago Parga</div>
     </div>
     <div class="header-tag">Monitor de redes</div>
-  </header>
+  </div>
+</div>
 
-  <!-- ============================================================
-       CONFIGURA AQUÍ TU GOOGLE SHEET
-       1. Abre tu Google Sheet
-       2. Archivo → Compartir → Publicar en la web
-       3. Selecciona la hoja, formato CSV, y copia la URL
-       4. Pégala abajo en SHEET_CSV_URL
-       ============================================================ -->
-  <script>
-    const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vThCt_IKb2w8rajakaGjtxaRcQIWZS-zq4GWfzT-K_t9N47I29zjGdqpXYAYbDAyBEGVT-gtLmnsq7R/pub?gid=0&single=true&output=csv";
+<script>
+  const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vThCt_IKb2w8rajakaGjtxaRcQIWZS-zq4GWfzT-K_t9N47I29zjGdqpXYAYbDAyBEGVT-gtLmnsq7R/pub?gid=0&single=true&output=csv";
+  const PLATFORMS = [
+    { id: 'Instagram',   aliases: ['instagram'],                                bg: 'rgba(225,48,108,0.1)',  text: '#c2185b' },
+    { id: 'X / Twitter', aliases: ['x','twitter','x / twitter','twitter / x'], bg: 'rgba(0,0,0,0.07)',      text: '#222222' },
+    { id: 'TikTok',      aliases: ['tiktok'],                                  bg: 'rgba(0,0,0,0.07)',      text: '#333333' },
+    { id: 'Facebook',    aliases: ['facebook'],                                bg: 'rgba(24,119,242,0.1)',  text: '#1565c0' },
+    { id: 'LinkedIn',    aliases: ['linkedin'],                                bg: 'rgba(10,102,194,0.1)',  text: '#01579b' },
+    { id: 'Meta',        aliases: ['meta'],                                    bg: 'rgba(0,130,251,0.1)',   text: '#0277bd' },
+    { id: 'Reddit',      aliases: ['reddit'],                                  bg: 'rgba(255,69,0,0.1)',    text: '#bf360c' },
+    { id: 'Pinterest',   aliases: ['pinterest'],                               bg: 'rgba(230,0,35,0.1)',    text: '#b71c1c' },
+    { id: 'Snapchat',    aliases: ['snapchat'],                                bg: 'rgba(255,190,0,0.12)', text: '#e65100' },
+  ];
+</script>
 
-    // Columnas esperadas en tu hoja (exactamente como las tienes):
-    // Plataforma | Título | Nota | URL | Fecha
-    // La columna Fecha debe tener formato: DD/MM/AAAA o AAAA-MM-DD
+<div class="app">
+  <div id="config-notice"></div>
 
-    const PLATFORMS = [
-      { id: 'Instagram',  aliases: ['instagram'],           color: '#E1306C', bg: 'rgba(225,48,108,0.15)',  text: '#f9a8c9' },
-      { id: 'X / Twitter', aliases: ['x','twitter','x / twitter','twitter / x'], color: '#1DA1F2', bg: 'rgba(29,161,242,0.15)',  text: '#7dd3fc' },
-      { id: 'TikTok',     aliases: ['tiktok'],              color: '#aaaaaa', bg: 'rgba(180,180,180,0.12)', text: '#cccccc' },
-      { id: 'Facebook',   aliases: ['facebook'],            color: '#1877F2', bg: 'rgba(24,119,242,0.15)',  text: '#93c5fd' },
-      { id: 'LinkedIn',   aliases: ['linkedin'],            color: '#0A66C2', bg: 'rgba(10,102,194,0.15)',  text: '#7fb3e8' },
-      { id: 'Meta',       aliases: ['meta'],                color: '#0082FB', bg: 'rgba(0,130,251,0.15)',   text: '#93c5fd' },
-      { id: 'Reddit',     aliases: ['reddit'],              color: '#FF4500', bg: 'rgba(255,69,0,0.15)',    text: '#fca47a' },
-      { id: 'Pinterest',  aliases: ['pinterest'],           color: '#E60023', bg: 'rgba(230,0,35,0.15)',   text: '#fca5a5' },
-      { id: 'Snapchat',   aliases: ['snapchat'],            color: '#FFFC00', bg: 'rgba(255,252,0,0.12)',   text: '#d4b800' },
-    ];
-  </script>
-
-  <!-- SCREEN 1 -->
   <div class="screen active" id="screen-1">
-    <div id="config-notice"></div>
     <div class="section-label">Selecciona una plataforma</div>
     <div class="platform-grid" id="platform-grid">
-      <div class="loading-state">Cargando datos…</div>
+      <div class="loading-state">Cargando datos&hellip;</div>
     </div>
   </div>
 
-  <!-- SCREEN 2 -->
   <div class="screen" id="screen-2">
     <div class="nav-row">
-      <button class="back-btn" onclick="goBack()">← Volver</button>
-      <div class="breadcrumb"><strong id="bc-platform"></strong> · <span id="bc-filter">7 días</span></div>
+      <button class="back-btn" onclick="goBack()">&larr; Volver</button>
+      <div class="breadcrumb"><strong id="bc-platform"></strong> &middot; <span id="bc-filter">7 d&iacute;as</span></div>
     </div>
-    <div class="section-label">Filtrar por período</div>
+    <div class="section-label">Filtrar por per&iacute;odo</div>
     <div class="filter-row">
-      <button class="filter-btn active" onclick="setFilter(7,  this)">Últimos 7 días</button>
-      <button class="filter-btn"        onclick="setFilter(14, this)">Últimos 14 días</button>
-      <button class="filter-btn"        onclick="setFilter(30, this)">Último mes</button>
+      <button class="filter-btn active" onclick="setFilter(7,  this)">&Uacute;ltimos 7 d&iacute;as</button>
+      <button class="filter-btn"        onclick="setFilter(14, this)">&Uacute;ltimos 14 d&iacute;as</button>
+      <button class="filter-btn"        onclick="setFilter(30, this)">&Uacute;ltimo mes</button>
       <button class="filter-btn"        onclick="setFilter(999,this)">Todo</button>
     </div>
     <div class="results-meta" id="results-meta"></div>
     <div class="news-list" id="news-list"></div>
   </div>
-
 </div>
 
 <script>
-  let allNews = [];
-  let selectedPlatform = null;
-  let currentDays = 7;
+  let allNews = [], selectedPlatform = null, currentDays = 7;
 
-  // ---------- PARSEO CSV ----------
   function parseCSV(text) {
     const lines = text.trim().split('\n');
     if (lines.length < 2) return [];
@@ -238,19 +173,15 @@
     return lines.slice(1).map(line => {
       const cols = line.match(/(".*?"|[^,]+|(?<=,)(?=,)|(?<=,)$|^(?=,))/g) || [];
       const obj = {};
-      headers.forEach((h, i) => {
-        obj[h] = (cols[i] || '').trim().replace(/^"|"$/g, '');
-      });
+      headers.forEach((h, i) => { obj[h] = (cols[i] || '').trim().replace(/^"|"$/g, ''); });
       return obj;
     }).filter(r => r.plataforma || r.titulo);
   }
 
   function parseDate(str) {
     if (!str) return null;
-    // DD/MM/AAAA
     const dmy = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
     if (dmy) return new Date(+dmy[3], +dmy[2]-1, +dmy[1]);
-    // AAAA-MM-DD
     const ymd = str.match(/^(\d{4})-(\d{2})-(\d{2})$/);
     if (ymd) return new Date(+ymd[1], +ymd[2]-1, +ymd[3]);
     return new Date(str);
@@ -261,15 +192,10 @@
     return d.toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
   }
 
-  // ---------- CARGA ----------
   async function loadData() {
     if (SHEET_CSV_URL.startsWith('TU_URL')) {
       loadSampleData();
-      document.getElementById('config-notice').innerHTML = `
-        <div class="config-banner">
-          <strong>Modo demo</strong> — estás viendo datos de ejemplo.<br>
-          Edita <code>SHEET_CSV_URL</code> en el archivo <code>index.html</code> con la URL CSV de tu Google Sheet para ver tus noticias reales.
-        </div>`;
+      document.getElementById('config-notice').innerHTML = `<div class="config-banner"><strong>Modo demo</strong> &mdash; datos de ejemplo.<br>Edita <code>SHEET_CSV_URL</code> con tu URL CSV real.</div>`;
       return;
     }
     try {
@@ -277,40 +203,29 @@
       if (!res.ok) throw new Error('No se pudo cargar el archivo');
       const text = await res.text();
       allNews = parseCSV(text).map(r => ({
-        plataforma: r.plataforma || r['plataforma'] || '',
-        titulo:     r['título'] || r['titulo'] || r.title || '',
+        plataforma: r.plataforma || '',
+        titulo:     r['\u00edtulo'] || r['t\u00edtulo'] || r['titulo'] || r.title || '',
         nota:       r.nota || r.note || r.resumen || '',
         url:        r.url || r.link || r.enlace || '',
-        fecha:      parseDate(r.fecha || r.date || r['fecha'] || '')
+        fecha:      parseDate(r.fecha || r.date || '')
       }));
       buildPlatformGrid();
-    } catch (e) {
-      document.getElementById('platform-grid').innerHTML =
-        `<div class="error-state">Error al cargar los datos.<br>${e.message}</div>`;
+    } catch(e) {
+      document.getElementById('platform-grid').innerHTML = `<div class="error-state">Error al cargar datos.<br>${e.message}</div>`;
     }
   }
 
   function loadSampleData() {
-    const today = new Date();
-    const ago = n => { const d = new Date(today); d.setDate(d.getDate()-n); return d; };
+    const ago = n => { const d = new Date(); d.setDate(d.getDate()-n); return d; };
     allNews = [
-      { plataforma:'Instagram', titulo:'Instagram prueba herramientas de edición avanzada para Reels', nota:'La plataforma busca competir con CapCut ofreciendo filtros y transiciones dentro de la propia app.', url:'#', fecha:ago(2) },
-      { plataforma:'Instagram', titulo:'El algoritmo penaliza el contenido reposteado sin valor añadido', nota:'Un cambio en las directrices premia el contenido original frente a los reposteos directos.', url:'#', fecha:ago(5) },
-      { plataforma:'Instagram', titulo:'Monetización de Reels llega a España y más países europeos', nota:'Los creadores de la UE ya pueden acceder a las bonificaciones por reproducciones de Reels.', url:'#', fecha:ago(18) },
-      { plataforma:'Twitter',   titulo:'X cambia los requisitos de verificación para cuentas y organizaciones', nota:'La compañía diferencia ahora entre verificación de persona y de entidad corporativa.', url:'#', fecha:ago(1) },
-      { plataforma:'Twitter',   titulo:'Las notas de la comunidad se amplían a contenido de salud y ciencia', nota:'El sistema de verificación colaborativa ahora cubre nuevas categorías temáticas.', url:'#', fecha:ago(9) },
-      { plataforma:'Twitter',   titulo:'X prueba artículos de larga duración para suscriptores Premium', nota:'Los creadores podrán publicar contenido sin límite de caracteres directamente en la plataforma.', url:'#', fecha:ago(25) },
-      { plataforma:'TikTok',    titulo:'TikTok Shop se lanza oficialmente en España', nota:'El comercio integrado permite vender productos directamente desde los vídeos sin salir de la app.', url:'#', fecha:ago(3) },
-      { plataforma:'TikTok',    titulo:'El límite de duración de vídeos sube a 20 minutos', nota:'Siguiendo la tendencia hacia contenido largo, la plataforma amplía el tope para todos los creadores.', url:'#', fecha:ago(22) },
-      { plataforma:'Facebook',  titulo:'Facebook Marketplace incorpora pagos integrados en Europa', nota:'Los usuarios podrán completar transacciones sin salir de la aplicación.', url:'#', fecha:ago(4) },
-      { plataforma:'Facebook',  titulo:'Meta actualiza normas de privacidad en grupos de Facebook', nota:'Los administradores tendrán más control sobre quién puede ver el contenido de sus comunidades.', url:'#', fecha:ago(15) },
-      { plataforma:'LinkedIn',  titulo:'LinkedIn lanza IA para optimizar perfiles profesionales', nota:'La nueva función analiza el perfil y sugiere mejoras basadas en ofertas de empleo relevantes.', url:'#', fecha:ago(6) },
-      { plataforma:'LinkedIn',  titulo:'Los artículos colaborativos superan los 10 millones de contribuciones', nota:'La función de conocimiento colectivo se consolida como una de las más activas de la plataforma.', url:'#', fecha:ago(29) },
+      { plataforma:'Instagram', titulo:'Instagram prueba herramientas de edici\u00f3n avanzada para Reels', nota:'La plataforma busca competir con CapCut ofreciendo filtros y transiciones dentro de la propia app.', url:'#', fecha:ago(2) },
+      { plataforma:'Twitter',   titulo:'X cambia los requisitos de verificaci\u00f3n para cuentas', nota:'La compa\u00f1\u00eda diferencia ahora entre verificaci\u00f3n de persona y de entidad corporativa.', url:'#', fecha:ago(1) },
+      { plataforma:'TikTok',    titulo:'TikTok Shop se lanza oficialmente en Espa\u00f1a', nota:'El comercio integrado permite vender productos directamente desde los v\u00eddeos.', url:'#', fecha:ago(3) },
+      { plataforma:'LinkedIn',  titulo:'LinkedIn lanza IA para optimizar perfiles profesionales', nota:'La nueva funci\u00f3n analiza el perfil y sugiere mejoras basadas en ofertas de empleo relevantes.', url:'#', fecha:ago(6) },
     ];
     buildPlatformGrid();
   }
 
-  // ---------- PANTALLA 1 ----------
   function buildPlatformGrid() {
     const grid = document.getElementById('platform-grid');
     grid.innerHTML = '';
@@ -318,23 +233,17 @@
       const count = allNews.filter(n => p.aliases.includes(n.plataforma.toLowerCase())).length;
       const card = document.createElement('div');
       card.className = 'platform-card';
-      card.innerHTML = `
-        <div class="platform-icon">${platformIcon(p.id)}</div>
-        <div>
-          <div class="platform-name">${p.id}</div>
-          <div class="platform-count">${count} noticia${count !== 1 ? 's' : ''}</div>
-        </div>`;
+      card.innerHTML = `<div class="platform-icon">${platformIcon(p.id)}</div><div><div class="platform-name">${p.id}</div><div class="platform-count">${count} noticia${count!==1?'s':''}</div></div>`;
       card.onclick = () => { selectedPlatform = p; goToScreen2(); };
       grid.appendChild(card);
     });
   }
 
-  // ---------- PANTALLA 2 ----------
   function goToScreen2() {
     document.getElementById('bc-platform').textContent = selectedPlatform.id;
     currentDays = 7;
     document.querySelectorAll('.filter-btn').forEach((b,i) => b.classList.toggle('active', i===0));
-    document.getElementById('bc-filter').textContent = '7 días';
+    document.getElementById('bc-filter').textContent = '7 d\u00edas';
     document.getElementById('screen-1').classList.remove('active');
     document.getElementById('screen-2').classList.add('active');
     renderNews();
@@ -349,7 +258,7 @@
     currentDays = days;
     document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
-    const labels = {7:'7 días', 14:'14 días', 30:'último mes', 999:'todo'};
+    const labels = {7:'7 d\u00edas',14:'14 d\u00edas',30:'\u00faltimo mes',999:'todo'};
     document.getElementById('bc-filter').textContent = labels[days];
     renderNews();
   }
@@ -358,20 +267,18 @@
     const list = document.getElementById('news-list');
     const cutoff = new Date(); cutoff.setDate(cutoff.getDate() - currentDays);
     const p = selectedPlatform;
-
     const filtered = allNews
       .filter(n => p.aliases.includes(n.plataforma.toLowerCase()))
       .filter(n => currentDays === 999 || !n.fecha || n.fecha >= cutoff)
       .sort((a,b) => (b.fecha||0) - (a.fecha||0));
 
     document.getElementById('results-meta').textContent =
-      `${filtered.length} noticia${filtered.length !== 1 ? 's' : ''} encontrada${filtered.length !== 1 ? 's' : ''}`;
+      `${filtered.length} noticia${filtered.length!==1?'s':''} encontrada${filtered.length!==1?'s':''}`;
 
     if (!filtered.length) {
-      list.innerHTML = `<div class="empty-state">Sin noticias en este período.<br>Prueba con un rango mayor.</div>`;
+      list.innerHTML = `<div class="empty-state">Sin noticias en este per\u00edodo.<br>Prueba con un rango mayor.</div>`;
       return;
     }
-
     list.innerHTML = '';
     filtered.forEach(n => {
       const card = document.createElement('div');
@@ -383,28 +290,29 @@
         </div>
         <div class="news-title">${n.titulo}</div>
         ${n.nota ? `<div class="news-nota">${n.nota}</div>` : ''}
-        ${n.url && n.url !== '#' ? `<a class="news-link" href="${n.url}" target="_blank">Leer noticia →</a>` : ''}
-      `;
+        ${n.url && n.url !== '#' ? `<a class="news-link" href="${n.url}" target="_blank">Leer noticia &rarr;</a>` : ''}`;
       list.appendChild(card);
     });
   }
 
- function platformIcon(id) {
-  const icons = {
-    'Instagram':   `<img src="https://cdn.simpleicons.org/instagram/E1306C" style="width:20px;height:20px;">`,
-    'X / Twitter': `<img src="https://cdn.simpleicons.org/x/1DA1F2" style="width:20px;height:20px;">`,
-    'TikTok':      `<img src="https://cdn.simpleicons.org/tiktok/aaaaaa" style="width:20px;height:20px;">`,
-    'Facebook':    `<img src="https://cdn.simpleicons.org/facebook/1877F2" style="width:20px;height:20px;">`,
-    'LinkedIn':    `<svg viewBox="0 0 24 24" fill="#0A66C2"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>`,
-    'Meta':        `<img src="https://cdn.simpleicons.org/meta/0082FB" style="width:20px;height:20px;">`,
-    'Reddit':      `<img src="https://cdn.simpleicons.org/reddit/FF4500" style="width:20px;height:20px;">`,
-    'Pinterest':   `<img src="https://cdn.simpleicons.org/pinterest/E60023" style="width:20px;height:20px;">`,
-    'Snapchat':    `<img src="https://cdn.simpleicons.org/snapchat/FFFC00" style="width:20px;height:20px;">`,
-  };
-  return icons[id] || '';
-}
+  function platformIcon(id) {
+    const icons = {
+      'Instagram':   `<img src="https://cdn.simpleicons.org/instagram/E1306C" style="width:20px;height:20px" alt="Instagram">`,
+      'X / Twitter': `<img src="https://cdn.simpleicons.org/x/222222" style="width:20px;height:20px" alt="X">`,
+      'TikTok':      `<img src="https://cdn.simpleicons.org/tiktok/333333" style="width:20px;height:20px" alt="TikTok">`,
+      'Facebook':    `<img src="https://cdn.simpleicons.org/facebook/1877F2" style="width:20px;height:20px" alt="Facebook">`,
+      'LinkedIn':    `<svg viewBox="0 0 24 24" fill="#0A66C2" width="20" height="20"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>`,
+      'Meta':        `<img src="https://cdn.simpleicons.org/meta/0082FB" style="width:20px;height:20px" alt="Meta">`,
+      'Reddit':      `<img src="https://cdn.simpleicons.org/reddit/FF4500" style="width:20px;height:20px" alt="Reddit">`,
+      'Pinterest':   `<img src="https://cdn.simpleicons.org/pinterest/E60023" style="width:20px;height:20px" alt="Pinterest">`,
+      'Snapchat':    `<img src="https://cdn.simpleicons.org/snapchat/FFBE00" style="width:20px;height:20px" alt="Snapchat">`,
+    };
+    return icons[id] || '';
+  }
 
   loadData();
 </script>
+</body>
+</html>
 </body>
 </html>
