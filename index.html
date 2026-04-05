@@ -2,8 +2,35 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
+
+<!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-M7VP7WL9LM"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-M7VP7WL9LM');
+  </script>
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Socialgeek News</title>
+  <title>Socialgeek.News — Monitor de redes sociales</title>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="logo_social-geek-logo.png" />
+  <link rel="apple-touch-icon" href="logo_social-geek-logo.png" />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Socialgeek.News" />
+  <meta property="og:description" content="Monitor de noticias de redes sociales by Iago Parga" />
+  <meta property="og:image" content="https://socialgeeknews.com/encabezado_social-geek-logo.png" />
+  <meta property="og:url" content="https://socialgeeknews.com" />
+  <meta property="og:type" content="website" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Socialgeek.News" />
+  <meta name="twitter:description" content="Monitor de noticias de redes sociales by Iago Parga" />
+  <meta name="twitter:image" content="https://socialgeeknews.com/encabezado_social-geek-logo.png" />
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -99,6 +126,17 @@
     .empty-state, .loading-state, .error-state { text-align: center; padding: 4rem 1rem; color: var(--text-dim); font-size: 14px; line-height: 1.7; }
     .error-state { color: #cc3333; }
 
+    /* Loading spinner */
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-state { display: flex; flex-direction: column; align-items: center; gap: 1rem; }
+    .loading-state::before { content: ''; width: 26px; height: 26px; border: 2.5px solid var(--border); border-top-color: #111; border-radius: 50%; animation: spin 0.7s linear infinite; }
+    .platform-grid > .loading-state { grid-column: 1 / -1; }
+
+    /* Platform card focus & no-news */
+    .platform-card:focus-visible { outline: 2px solid #111; outline-offset: 2px; }
+    .platform-card.no-news { opacity: 0.38; cursor: default; }
+    .platform-card.no-news:hover { transform: none; box-shadow: none; border-color: var(--border); }
+
     .config-banner { background: #fffde7; border: 1px solid #f0e040; border-radius: var(--radius); padding: 1rem 1.25rem; margin-bottom: 2rem; font-size: 13px; color: #666; line-height: 1.7; }
     .config-banner code { background: rgba(0,0,0,0.06); padding: 2px 6px; border-radius: 4px; font-size: 12px; color: #333; font-family: monospace; }
 
@@ -155,6 +193,7 @@
     { id: 'Reddit',      aliases: ['reddit'],                                  bg: 'rgba(255,69,0,0.1)',    text: '#bf360c' },
     { id: 'Pinterest',   aliases: ['pinterest'],                               bg: 'rgba(230,0,35,0.1)',    text: '#b71c1c' },
     { id: 'Snapchat',    aliases: ['snapchat'],                                bg: 'rgba(255,190,0,0.12)', text: '#e65100' },
+    { id: 'YouTube',     aliases: ['youtube'],                                 bg: 'rgba(255,0,0,0.08)',    text: '#c62828' },
   ];
 </script>
 
@@ -168,7 +207,7 @@
     </div>
     <div class="cta-block">
       <p class="cta-text">Si quieres recibir todas las novedades de Social Media directamente en tu bandeja de entrada, &uacute;nete a la newsletter.</p>
-      <a class="cta-btn" href="https://socialgeekpro.beehiiv.com/" target="_blank">&#128232; Suscr&iacute;bete</a>
+      <a class="cta-btn" href="https://socialgeekpro.beehiiv.com/" target="_blank" rel="noopener noreferrer" onclick="gtag('event', 'clic_suscribete');">&#128232; Suscr&iacute;bete</a>
     </div>
   </div>
 
@@ -197,14 +236,41 @@
 <script>
   let allNews = [], selectedPlatform = null, currentDays = 7;
 
+  function escapeHtml(str) {
+    return String(str ?? '')
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+
+  function safeUrl(url) {
+    if (!url || url === '#') return null;
+    try { const u = new URL(url); return (u.protocol === 'http:' || u.protocol === 'https:') ? url : null; }
+    catch { return null; }
+  }
+
   function parseCSV(text) {
-    const lines = text.trim().split('\n');
-    if (lines.length < 2) return [];
-    const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, '').toLowerCase());
-    return lines.slice(1).map(line => {
-      const cols = line.match(/(".*?"|[^,]+|(?<=,)(?=,)|(?<=,)$|^(?=,))/g) || [];
+    // Proper state-machine parser — handles quoted fields with commas/newlines
+    const rows = [];
+    let row = [], field = '', inQ = false;
+    for (let i = 0; i < text.length; i++) {
+      const ch = text[i];
+      if (inQ) {
+        if (ch === '"' && text[i + 1] === '"') { field += '"'; i++; }
+        else if (ch === '"') { inQ = false; }
+        else { field += ch; }
+      } else {
+        if (ch === '"') { inQ = true; }
+        else if (ch === ',') { row.push(field.trim()); field = ''; }
+        else if (ch === '\n') { row.push(field.trim()); rows.push(row); row = []; field = ''; }
+        else if (ch !== '\r') { field += ch; }
+      }
+    }
+    if (field || row.length) { row.push(field.trim()); rows.push(row); }
+    if (rows.length < 2) return [];
+    const headers = rows[0].map(h => h.toLowerCase());
+    return rows.slice(1).map(cols => {
       const obj = {};
-      headers.forEach((h, i) => { obj[h] = (cols[i] || '').trim().replace(/^"|"$/g, ''); });
+      headers.forEach((h, i) => { obj[h] = cols[i] || ''; });
       return obj;
     }).filter(r => r.plataforma || r.titulo);
   }
@@ -263,14 +329,19 @@
     PLATFORMS.forEach(p => {
       const count = allNews.filter(n => p.aliases.includes(n.plataforma.toLowerCase())).length;
       const card = document.createElement('div');
-      card.className = 'platform-card';
-      card.innerHTML = `<div class="platform-icon">${platformIcon(p.id)}</div><div><div class="platform-name">${p.id}</div><div class="platform-count">${count} noticia${count!==1?'s':''}</div></div>`;
-      card.onclick = () => { selectedPlatform = p; goToScreen2(); };
+      card.className = 'platform-card' + (count === 0 ? ' no-news' : '');
+      card.setAttribute('tabindex', '0');
+      card.setAttribute('role', 'button');
+      card.setAttribute('aria-label', `${p.id}, ${count} noticias`);
+      card.innerHTML = `<div class="platform-icon">${platformIcon(p.id)}</div><div><div class="platform-name">${escapeHtml(p.id)}</div><div class="platform-count">${count} noticia${count!==1?'s':''}</div></div>`;
+      const activate = () => { selectedPlatform = p; goToScreen2(); };
+      card.onclick = activate;
+      card.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activate(); } };
       grid.appendChild(card);
     });
   }
 
-  function goToScreen2() {
+  function goToScreen2(pushState) {
     document.getElementById('bc-platform').textContent = selectedPlatform.id;
     currentDays = 7;
     document.querySelectorAll('.filter-btn').forEach((b,i) => b.classList.toggle('active', i===0));
@@ -278,12 +349,30 @@
     document.getElementById('screen-1').classList.remove('active');
     document.getElementById('screen-2').classList.add('active');
     renderNews();
+    gtag('event', 'plataforma_vista', { red_social: selectedPlatform.id });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (pushState !== false) {
+      const hashId = selectedPlatform.id === 'X / Twitter' ? 'twitter' : encodeURIComponent(selectedPlatform.id);
+      history.pushState({ platform: selectedPlatform.id }, '', '#' + hashId);
+    }
   }
 
   function goBack() {
     document.getElementById('screen-2').classList.remove('active');
     document.getElementById('screen-1').classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    history.pushState({}, '', window.location.pathname);
   }
+
+  window.addEventListener('popstate', function(e) {
+    if (e.state && e.state.platform) {
+      const p = PLATFORMS.find(p => p.id === e.state.platform);
+      if (p) { selectedPlatform = p; goToScreen2(false); }
+    } else {
+      document.getElementById('screen-2').classList.remove('active');
+      document.getElementById('screen-1').classList.add('active');
+    }
+  });
 
   function setFilter(days, btn) {
     currentDays = days;
@@ -314,29 +403,31 @@
     filtered.forEach(n => {
       const card = document.createElement('div');
       card.className = 'news-card';
+      const link = safeUrl(n.url);
       card.innerHTML = `
         <div class="news-top">
-          <span class="news-badge" style="background:${p.bg};color:${p.text}">${p.id}</span>
-          ${n.fecha ? `<span class="news-date">${formatDate(n.fecha)}</span>` : ''}
+          <span class="news-badge" style="background:${p.bg};color:${p.text}">${escapeHtml(p.id)}</span>
+          ${n.fecha ? `<span class="news-date">${escapeHtml(formatDate(n.fecha))}</span>` : ''}
         </div>
-        <div class="news-title">${n.titulo}</div>
-        ${n.nota ? `<div class="news-nota">${n.nota}</div>` : ''}
-        ${n.url && n.url !== '#' ? `<a class="news-link" href="${n.url}" target="_blank">Leer noticia &rarr;</a>` : ''}`;
+        <div class="news-title">${escapeHtml(n.titulo)}</div>
+        ${n.nota ? `<div class="news-nota">${escapeHtml(n.nota)}</div>` : ''}
+        ${link ? `<a class="news-link" href="${escapeHtml(link)}" target="_blank" rel="noopener noreferrer">Leer noticia &rarr;</a>` : ''}`;
       list.appendChild(card);
     });
   }
 
   function platformIcon(id) {
     const icons = {
-      'Instagram':   `<img src="https://cdn.simpleicons.org/instagram/E1306C" style="width:20px;height:20px" alt="Instagram">`,
-      'X / Twitter': `<img src="https://cdn.simpleicons.org/x/222222" style="width:20px;height:20px" alt="X">`,
-      'TikTok':      `<img src="https://cdn.simpleicons.org/tiktok/333333" style="width:20px;height:20px" alt="TikTok">`,
-      'Facebook':    `<img src="https://cdn.simpleicons.org/facebook/1877F2" style="width:20px;height:20px" alt="Facebook">`,
+      'Instagram':   `<img src="logos/logo-instagram.svg" width="20" height="20" alt="Instagram">`,
+      'X / Twitter': `<img src="logos/logo-x.svg" width="16" height="16" alt="X">`,
+      'TikTok':      `<img src="logos/logo-tiktok.svg" width="20" height="20" alt="TikTok">`,
+      'Facebook':    `<img src="logos/logo-facebook.svg" width="20" height="20" alt="Facebook">`,
       'LinkedIn':    `<svg viewBox="0 0 24 24" fill="#0A66C2" width="20" height="20"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>`,
-      'Meta':        `<img src="https://cdn.simpleicons.org/meta/0082FB" style="width:20px;height:20px" alt="Meta">`,
-      'Reddit':      `<img src="https://cdn.simpleicons.org/reddit/FF4500" style="width:20px;height:20px" alt="Reddit">`,
-      'Pinterest':   `<img src="https://cdn.simpleicons.org/pinterest/E60023" style="width:20px;height:20px" alt="Pinterest">`,
-      'Snapchat':    `<img src="https://cdn.simpleicons.org/snapchat/FFBE00" style="width:20px;height:20px" alt="Snapchat">`,
+      'Meta':        `<img src="logos/logo-meta.svg" width="20" height="20" alt="Meta">`,
+      'Reddit':      `<img src="logos/logo-reddit.svg" width="20" height="20" alt="Reddit">`,
+      'Pinterest':   `<img src="logos/logo-pinterest.svg" width="20" height="20" alt="Pinterest">`,
+      'Snapchat':    `<img src="logos/logo-snapchat.svg" width="20" height="20" alt="Snapchat">`,
+      'YouTube':     `<img src="logos/logo-youtube.svg" width="20" height="20" alt="YouTube">`,
     };
     return icons[id] || '';
   }
